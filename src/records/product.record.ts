@@ -1,8 +1,13 @@
-import {ProductEntity, ProductEntityResponse} from "../types";
+import {AllProductsResponse, ProductEntity, ProductEntityResponse} from "../types";
 import {ValidationError} from "../utils/error";
+import {v4 as uuid} from 'uuid';
+import {pool} from "../utils/db";
+import {FieldPacket} from "mysql2";
+
+type ProductRecordResults = [ProductEntityResponse[], FieldPacket[]];
 
 export class ProductRecord implements ProductEntityResponse {
-    id: string;
+    id?: string;
     name: string;
     price: number;
     updateDate: Date | null;
@@ -21,4 +26,45 @@ export class ProductRecord implements ProductEntityResponse {
         this.price = obj.price;
         this.updateDate = null;
     }
+
+    async insert(): Promise<ProductEntityResponse> {
+        if(!this.id) {
+            this.id = uuid();
+        }
+
+        await pool.execute("INSERT INTO `products` VALUES (:id, :name, :price, :updateDate)", {
+            id: this.id,
+            name: this.name,
+            price: this.price,
+            updateDate: this.updateDate,
+        });
+        return this;
+    };
+
+    static async getAllProducts(): Promise<AllProductsResponse> {
+        const [results] = await pool.execute("SELECT * FROM `products`") as ProductRecordResults;
+        return results.map(product => new ProductRecord(product));
+    }
+
+    static async getOneProductDetails(id: string): Promise<ProductEntityResponse | null> {
+        const [results] = await pool.execute("SELECT * FROM `products` WHERE `id` = :id", {
+            id,
+        }) as ProductRecordResults;
+        return results.length === 0 ? null : new ProductRecord(results[0]);
+    }
+
+    async updateOneProduct(id: string): Promise<void> {
+        await pool.execute("UPDATE `products` SET `name` = :name, `price` = :price WHERE `products`.`id` = :id", {
+            name: this.name,
+            price: this.price,
+            id,
+        });
+    }
+
+    static async deleteOneProduct(id: string): Promise<void> {
+        await pool.execute("DELETE FROM `products` WHERE `id` = :id", {
+            id,
+        });
+    }
+
 }

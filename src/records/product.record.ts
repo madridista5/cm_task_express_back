@@ -53,11 +53,12 @@ export class ProductRecord implements ProductEntityResponse {
         return results.length === 0 ? null : new ProductRecord(results[0]);
     }
 
-    async updateOneProduct(id: string): Promise<void> {
-        await pool.execute("UPDATE `products` SET `name` = :name, `price` = :price WHERE `products`.`id` = :id", {
-            name: this.name,
-            price: this.price,
-            id,
+    static async updateOneProduct(obj: ProductEntity): Promise<void> {
+        await pool.execute("UPDATE `products` SET `name` = :name, `price` = :price, `updateDate` = :updateDate WHERE `products`.`id` = :id", {
+            name: obj.name,
+            price: obj.price,
+            updateDate: new Date(),
+            id: obj.id,
         });
     }
 

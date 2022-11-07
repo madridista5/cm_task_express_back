@@ -1,10 +1,17 @@
 import {Router} from "express";
+import {
+    addOneProduct,
+    deleteOneProduct,
+    editOneProduct,
+    getAllProducts,
+    getOneProduct
+} from "../controllers/product.controller";
 
 export const productRouter = Router();
 
 productRouter
-    .get('/allProducts')
-    .get('/oneProductDetails')
-    .post('/add')
-    .put('/edit/:id')
-    .delete('/delete/:id');
+    .get('/allProducts', getAllProducts)
+    .get('/oneProductDetails/:id', getOneProduct)
+    .post('/add', addOneProduct)
+    .put('/edit/:id', editOneProduct)
+    .delete('/delete/:id', deleteOneProduct);

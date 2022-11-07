@@ -54,6 +54,9 @@ export class ProductRecord implements ProductEntityResponse {
     }
 
     static async updateOneProduct(obj: ProductEntity): Promise<void> {
+        if(!obj.id) {
+            throw new ValidationError('Product id is required!');
+        }
         await pool.execute("UPDATE `products` SET `name` = :name, `price` = :price, `updateDate` = :updateDate WHERE `products`.`id` = :id", {
             name: obj.name,
             price: obj.price,

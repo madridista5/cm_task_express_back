@@ -1,12 +1,12 @@
-import {AllProductsResponse, ProductEntity, ProductEntityResponse} from "../types";
+import {AllProductsResponse, ProductEntity} from "../types";
 import {ValidationError} from "../utils/error";
 import {v4 as uuid} from 'uuid';
 import {pool} from "../utils/db";
 import {FieldPacket} from "mysql2";
 
-type ProductRecordResults = [ProductEntityResponse[], FieldPacket[]];
+type ProductRecordResults = [ProductEntity[], FieldPacket[]];
 
-export class ProductRecord implements ProductEntityResponse {
+export class ProductRecord implements ProductEntity {
     id?: string;
     name: string;
     price: number;
@@ -24,10 +24,10 @@ export class ProductRecord implements ProductEntityResponse {
         this.id = obj.id;
         this.name = obj.name;
         this.price = obj.price;
-        this.updateDate = null;
+        this.updateDate = obj.updateDate;
     }
 
-    async insert(): Promise<ProductEntityResponse> {
+    async insert(): Promise<ProductEntity> {
         if(!this.id) {
             this.id = uuid();
         }
@@ -46,7 +46,7 @@ export class ProductRecord implements ProductEntityResponse {
         return results.map(product => new ProductRecord(product));
     }
 
-    static async getOneProductDetails(id: string): Promise<ProductEntityResponse | null> {
+    static async getOneProductDetails(id: string): Promise<ProductEntity | null> {
         const [results] = await pool.execute("SELECT * FROM `products` WHERE `id` = :id", {
             id,
         }) as ProductRecordResults;

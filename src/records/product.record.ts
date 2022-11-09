@@ -24,7 +24,7 @@ export class ProductRecord implements ProductEntity {
         this.id = obj.id;
         this.name = obj.name;
         this.price = obj.price;
-        this.updateDate = obj.updateDate;
+        this.updateDate = obj.updateDate ?? null;
     }
 
     async insert(): Promise<ProductEntity> {

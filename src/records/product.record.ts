@@ -3,6 +3,7 @@ import {ValidationError} from "../utils/error";
 import {v4 as uuid} from 'uuid';
 import {pool} from "../utils/db";
 import {FieldPacket} from "mysql2";
+import {checkIsName, checkIsPrice, checkNameLength} from "../validations/validation";
 
 type ProductRecordResults = [ProductEntity[], FieldPacket[]];
 
@@ -13,13 +14,16 @@ export class ProductRecord implements ProductEntity {
     updateDate: Date | null;
 
     constructor(obj: ProductEntity) {
-        if(!obj.name || obj.name.length > 100) {
-            throw new ValidationError('The name cannot be empty and the length cannot has more than 100 characters!');
-        }
+        // if(!obj.name || obj.name.length > 100) {
+        //     throw new ValidationError('The name cannot be empty and the length cannot has more than 100 characters!');
+        // }
+        checkIsName(obj);
+        checkNameLength(obj);
 
-        if(!obj.price) {
-            throw new ValidationError('Price is required!');
-        }
+        // if(!obj.price) {
+        //     throw new ValidationError('Price is required!');
+        // }
+        checkIsPrice(obj);
 
         this.id = obj.id;
         this.name = obj.name;
